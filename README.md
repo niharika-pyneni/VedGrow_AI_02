@@ -1,103 +1,73 @@
-# 📚 StudyBuddy AI - FAQ Chatbot
+# StudyBuddy AI 📚🤖
 
-## 📖 Overview
+StudyBuddy AI is an AI-powered study assistant that helps users interact with their study materials. Users can upload documents and ask questions, and the application retrieves relevant information to provide helpful answers.
 
-StudyBuddy AI is an NLP-powered FAQ chatbot developed as part of **VedGrow AI Internship - Task 02**.
+This project uses Natural Language Processing (NLP), sentence embeddings, and similarity-based retrieval techniques to understand user queries and provide relevant responses.
 
-The chatbot helps students by answering frequently asked questions related to study techniques, exam preparation, concentration, revision methods, time management, active recall, and productivity.
+## Features ✨
 
-The system uses Natural Language Processing (NLP) to identify and return the most relevant answer from a predefined FAQ dataset.
+- 📄 Upload and process study documents
+- 💬 Interactive chat-style interface
+- 🧠 Semantic search using sentence embeddings
+- 🔍 Retrieves relevant information from uploaded content
+- 🤖 AI-powered question answering
+- ⚡ Fast similarity matching using cosine similarity
+- 📚 Helps students understand study materials easily
 
----
-
-## 🚀 Features
-
-- Study-related FAQ assistance
-- NLP-based question matching
-- TF-IDF Vectorization
-- Cosine Similarity Matching
-- Related Question Recommendations
-- Interactive Web Interface
-- Automatic Browser Launch
-- User-Friendly Design
-
----
-
-## 🛠️ Technologies Used
+## Technologies Used 🛠️
 
 - Python
-- Flask
+- Streamlit
+- Sentence Transformers
+- Transformers
 - Scikit-learn
-- HTML
-- CSS
-- Natural Language Processing (NLP)
+- NLP
+- Cosine Similarity
+- Tiktoken
 
----
+## How It Works ⚙️
 
-## ⚙️ Working Principle
+1. User uploads a document or study material.
+2. Text is extracted and processed.
+3. The extracted content is converted into embeddings.
+4. User questions are converted into embeddings.
+5. Cosine similarity is used to find the most relevant information.
+6. The chatbot provides answers based on the retrieved context.
 
-1. User enters a study-related question.
-2. The question is converted into numerical vectors using TF-IDF Vectorization.
-3. Cosine Similarity compares the user's query with stored FAQ questions.
-4. The chatbot retrieves the most relevant answer.
-5. Related questions are recommended to help users explore similar topics.
+## Project Structure 📂
 
----
+    StudyBuddy_AI/
+    │
+    ├── app.py
+    ├── file_utils.py
+    ├── requirements.txt
+    ├── README.md
+    └── .gitignore
 
-## 📂 Project Structure
 
-```text
-VedGrow_AI_02/
-│
-├── app.py
-├── faq_data.json
-├── requirements.txt
-└── README.md
-```
+## Installation & Setup 🚀
 
----
+Clone the repository:
 
-## ▶️ Installation & Usage
+    git clone YOUR_GITHUB_REPOSITORY_LINK
 
-### Clone the Repository
+Install dependencies:
 
-```bash
-git clone https://github.com/niharika-pyneni/VedGrow_AI_02.git
-```
+    pip install -r requirements.txt
 
-### Navigate to Project Folder
+Run the application:
 
-```bash
-cd VedGrow_AI_02
-```
+    streamlit run app.py
 
-### Install Dependencies
 
-```bash
-pip install -r requirements.txt
-```
+## Future Improvements 🚀
 
-### Run the Application
+- Add long-term conversation memory
+- Support more document formats
+- Improve answer generation
+- Deploy the application online
 
-```bash
-python app.py
-```
 
-The application will automatically open in your browser at:
+## Author
 
-```text
-http://127.0.0.1:5000
-```
-
----
-
-## 🔮 Future Enhancements
-
-- Voice-based interaction
-- Dark mode support
-- Larger FAQ dataset
-- Chat history support
-- Advanced AI-based responses
-
----
-
+Niharika Pyneni
