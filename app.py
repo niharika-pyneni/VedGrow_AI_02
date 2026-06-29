@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template_string
+from flask import Flask, request, render_template_string, session
 import json
 import webbrowser
 from threading import Timer
@@ -7,7 +7,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 app = Flask(__name__)
-
+app.secret_key = "StudyBuddy_AI_2026_secure_key"
 # Load FAQ data
 with open("faq_data.json", "r", encoding="utf-8") as file:
     faqs = json.load(file)
@@ -256,7 +256,23 @@ HTML = """
         </button>
 
     </div>
+{% for chat in session.get("history", []) %}
 
+<div class="chat-box">
+
+<div class="user-msg">
+<strong>You:</strong><br>
+{{ chat.question }}
+</div>
+
+<div class="bot-msg">
+<strong>StudyBuddy AI:</strong><br>
+{{ chat.answer }}
+</div>
+
+</div>
+
+{% endfor %}
     {% if answer %}
 
 <div class="chat-box">
@@ -310,11 +326,19 @@ def home():
     question = ""
     related_questions = []
 
+    if "history" not in session:
+        session["history"] = []
+
     if request.method == "POST":
         question = request.form["question"]
 
         answer, related_questions = get_answer(question)
+        session["history"].append({
+            "question": question,
+            "answer": answer
+        })
 
+        session["history"] = session["history"][-5:]
     return render_template_string(
         HTML,
         answer=answer,
