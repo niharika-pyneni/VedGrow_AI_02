@@ -53,117 +53,94 @@ HTML = """
 <!DOCTYPE html>
 <html>
 <head>
-    <title>StudyBuddy AI</title>
+<title>StudyBuddy AI</title>
 
-    <style>
+<style>
 
-        body{
-            margin:0;
-            font-family:Arial, sans-serif;
-            background:#eef2f7;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            min-height:100vh;
-            padding:20px;
-        }
-        
-        .container{
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#eef2f7;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    padding:20px;
+}
+
+.container{
     width:900px;
     max-width:95%;
     background:white;
     padding:30px;
     border-radius:15px;
     box-shadow:0 5px 20px rgba(0,0,0,0.15);
-        }
+}
 
-        h1{
-            text-align:center;
-            color:#2c3e50;
-            margin-bottom:10px;
-        }
+h1{
+    text-align:center;
+    color:#2c3e50;
+}
 
-        .subtitle{
-            text-align:center;
-            color:#666;
-            margin-bottom:25px;
-        }
+.subtitle{
+    text-align:center;
+    color:#666;
+}
 
-        form{
-            display:flex;
-            gap:10px;
-        }
+form{
+    display:flex;
+    gap:10px;
+}
 
-        input{
-            flex:1;
-            padding:12px;
-            border-radius:8px;
-            border:1px solid #ccc;
-            font-size:15px;
-        }
+input{
+    flex:1;
+    padding:12px;
+    border-radius:8px;
+    border:1px solid #ccc;
+}
 
-        button.ask-btn{
-            background:#3498db;
-            color:white;
-            border:none;
-            padding:12px 20px;
-            border-radius:8px;
-            cursor:pointer;
-        }
+button{
+    cursor:pointer;
+}
 
-        button.ask-btn:hover{
-            background:#2980b9;
-        }
+.ask-btn{
+    background:#3498db;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:8px;
+}
 
-        .faq-section{
-            margin-top:25px;
-        }
+.faq-btn{
+    background:#f1f5f9;
+    border:none;
+    padding:10px;
+    margin:5px;
+    border-radius:8px;
+}
 
-        .faq-section h3{
-            color:#2c3e50;
-        }
+.chat-box{
+    margin-top:20px;
+}
 
-        .faq-btn{
-            background:#f1f5f9;
-            border:none;
-            padding:10px;
-            margin:5px;
-            border-radius:8px;
-            cursor:pointer;
-        }
+.user-msg{
+    background:#dbeafe;
+    padding:12px;
+    border-radius:10px;
+    margin-bottom:10px;
+}
 
-        .faq-btn:hover{
-            background:#dbeafe;
-        }
+.bot-msg{
+    background:#ecfdf5;
+    padding:12px;
+    border-radius:10px;
+}
 
-        .chat-box{
-            margin-top:25px;
-        }
-
-        .user-msg{
-            background:#dbeafe;
-            padding:12px;
-            border-radius:10px;
-            margin-bottom:10px;
-        }
-
-        .bot-msg{
-            background:#ecfdf5;
-            padding:12px;
-            border-radius:10px;
-        }
-
-        .related-box{
+.related-box{
     margin-top:20px;
     padding:15px;
     background:#fff8e7;
     border-radius:10px;
-    border:1px solid #f5d98b;
-        }
-
-.related-box h3{
-    margin-top:0;
-    color:#2c3e50;
 }
 
 .related-question{
@@ -171,152 +148,124 @@ HTML = """
     padding:10px;
     margin:8px 0;
     border-radius:8px;
-    border:1px solid #ddd;
-    cursor:pointer;
-    transition:0.2s;
-}
-
-.related-question:hover{
-    background:#f9fafb;
 }
 
 .footer{
     margin-top:25px;
     text-align:center;
-    color:#777;
-    font-size:13px;
 }
 
-    </style>
+</style>
 
-    <script>
-        function fillQuestion(question){
-        document.getElementById("questionInput").value = question;
-        document.getElementById("questionInput").focus();
-        }
-    </script>
+<script>
+function fillQuestion(question){
+document.getElementById("questionInput").value = question;
+}
+</script>
 
 </head>
+
 
 <body>
 
 <div class="container">
 
-    <h1>📚 StudyBuddy AI</h1>
+<h1>📚 StudyBuddy AI</h1>
 
-    <div class="subtitle">
-        Your AI-Powered Study Assistant
-    </div>
+<div class="subtitle">
+Your AI-Powered Study Assistant
+</div>
 
-    <form method="POST">
-        <input
-            id="questionInput"
-            type="text"
-            name="question"
-            placeholder="Ask a study-related question..."
-            required
-        >
 
-        <button class="ask-btn" type="submit">
-            Ask
-        </button>
-    </form>
+<form method="POST">
 
-    <div class="faq-section">
-        <h3>📌 Popular Questions</h3>
+<input
+id="questionInput"
+type="text"
+name="question"
+placeholder="Ask a study-related question..."
+required>
 
-        <button class="faq-btn"
-        onclick="fillQuestion('How can I improve my concentration while studying?')">
-        Improve concentration
-        </button>
+<button class="ask-btn" type="submit">
+Ask
+</button>
 
-        <button class="faq-btn"
-        onclick="fillQuestion('What is the Pomodoro Technique?')">
-        Pomodoro Technique
-        </button>
+</form>
 
-        <button class="faq-btn"
-        onclick="fillQuestion('How can I avoid procrastination?')">
-        Avoid procrastination
-        </button>
 
-        <button class="faq-btn"
-        onclick="fillQuestion('How do I prepare for exams effectively?')">
-        Exam preparation
-        </button>
+<h3>📌 Popular Questions</h3>
 
-        <button class="faq-btn"
-        onclick="fillQuestion('What is active recall?')">
-        Active Recall
-        </button>
 
-        <button class="faq-btn"
-        onclick="fillQuestion('How can I reduce exam anxiety?')">
-        Exam anxiety
-        </button>
+<button class="faq-btn" onclick="fillQuestion('How can I improve my concentration while studying?')">
+Improve concentration
+</button>
 
-    </div>
-{% for chat in session.get("history", []) %}
+<button class="faq-btn" onclick="fillQuestion('What is the Pomodoro Technique?')">
+Pomodoro Technique
+</button>
+
+
+<button class="faq-btn" onclick="fillQuestion('How can I avoid procrastination?')">
+Avoid procrastination
+</button>
+
+
+{% for chat in session.get("history", [])|reverse %}
 
 <div class="chat-box">
 
 <div class="user-msg">
 <strong>You:</strong><br>
-{{ chat.question }}
+{{chat.question}}
 </div>
+
 
 <div class="bot-msg">
 <strong>StudyBuddy AI:</strong><br>
-{{ chat.answer }}
+{{chat.answer}}
 </div>
+
 
 </div>
 
 {% endfor %}
-    {% if answer %}
 
-<div class="chat-box">
 
-    <div class="user-msg">
-        <strong>You Asked:</strong><br>
-        {{ question }}
-    </div>
 
-    <div class="bot-msg">
-        <strong>StudyBuddy AI:</strong><br>
-        {{ answer }}
-    </div>
-
-</div>
+{% if related_questions %}
 
 <div class="related-box">
 
-    <h3>📚 You may also want to ask</h3>
+<h3>📚 You may also want to ask</h3>
 
-    {% for q in related_questions %}
+{% for q in related_questions %}
 
-    <div
-    class="related-question"
-    onclick="fillQuestion('{{ q }}')"
->
-    {{ q }}
+<div class="related-question"
+onclick="fillQuestion('{{q}}')">
+
+{{q}}
+
 </div>
 
-    {% endfor %}
+{% endfor %}
 
 </div>
 
 {% endif %}
 
-    <div class="footer">
-        Powered by NLP (TF-IDF + Cosine Similarity)
-    </div>
+
+
+<div class="footer">
+Powered by NLP (TF-IDF + Cosine Similarity)
+</div>
+
 
 </div>
 
 </body>
 </html>
 """
+
 
 
 @app.route("/", methods=["GET", "POST"])
