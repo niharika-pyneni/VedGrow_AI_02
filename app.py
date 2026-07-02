@@ -1,53 +1,86 @@
 from flask import Flask, request, render_template_string, session
-import json
 import webbrowser
+import os
+import markdown
 from threading import Timer
 
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+from dotenv import load_dotenv
+from groq import Groq
 
 app = Flask(__name__)
-app.secret_key = "StudyBuddy_AI_2026_secure_key"
-# Load FAQ data
-with open("faq_data.json", "r", encoding="utf-8") as file:
-    faqs = json.load(file)
+load_dotenv()
+if not os.getenv("GROQ_API_KEY"):
+    raise ValueError("GROQ_API_KEY not found in .env file")
+app.secret_key = os.getenv("SECRET_KEY")
 
-questions = [faq["question"] for faq in faqs]
-answers = [faq["answer"] for faq in faqs]
+client = Groq(
+    api_key=os.getenv("GROQ_API_KEY")
+)
 
-vectorizer = TfidfVectorizer()
-question_vectors = vectorizer.fit_transform(questions)
 
 
 def get_answer(user_question):
 
-    user_vector = vectorizer.transform([user_question])
+    system_prompt = """
+You are StudyBuddy AI, a helpful AI-powered study assistant.
 
-    similarity_scores = cosine_similarity(
-        user_vector,
-        question_vectors
-    )[0]
+Your job is to answer ONLY questions related to:
+- School and college subjects
+- Exams
+- Study techniques
+- Productivity
+- Learning strategies
+- Career guidance
 
-    best_match = similarity_scores.argmax()
+If the user asks anything unrelated (movies, politics, sports, celebrities, romance, etc.), politely reply:
 
-    if similarity_scores[best_match] < 0.2:
-        return (
-            "Sorry, I couldn't find a relevant answer. Please try asking your question differently.",
-            []
+"Sorry, I can only assist with study-related questions."
+
+Keep your answers concise, friendly and easy to read.
+
+Formatting Rules:
+- Use short paragraphs.
+- Use bullet points whenever possible.
+- Do not write one huge paragraph.
+- Leave a blank line between sections.
+- Keep every answer visually clean.
+"""
+
+    messages = [
+        {"role": "system", "content": system_prompt}
+    ]
+
+    # Last 5 conversations
+    for chat in session.get("history", []):
+        messages.append({
+            "role": "user",
+            "content": chat["question"]
+        })
+        messages.append({
+            "role": "assistant",
+            "content": chat["answer"]
+        })
+
+    messages.append({
+        "role": "user",
+        "content": user_question
+    })
+
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=messages,
+            temperature=0.4,
+            max_tokens=250
+    )
+
+        ai_answer = markdown.markdown(
+            response.choices[0].message.content
         )
 
-    sorted_indices = similarity_scores.argsort()[::-1]
-
-    related_questions = []
-
-    for idx in sorted_indices:
-        if idx != best_match:
-            related_questions.append(questions[idx])
-
-        if len(related_questions) == 4:
-            break
-
-    return answers[best_match], related_questions
+    except Exception:
+        ai_answer = "Sorry, something went wrong while contacting the AI. Please try again."
+    return ai_answer
 
 HTML = """
 <!DOCTYPE html>
@@ -56,110 +89,121 @@ HTML = """
 <title>StudyBuddy AI</title>
 
 <style>
-
 body{
     margin:0;
-    font-family:Arial, sans-serif;
-    background:#eef2f7;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    min-height:100vh;
-    padding:20px;
+    font-family:Arial,sans-serif;
+    background:#f3f4f6;
 }
 
-.container{
+.chat-container{
     width:900px;
     max-width:95%;
+    margin:25px auto;
     background:white;
-    padding:30px;
-    border-radius:15px;
-    box-shadow:0 5px 20px rgba(0,0,0,0.15);
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 5px 20px rgba(0,0,0,.15);
 }
 
-h1{
-    text-align:center;
-    color:#2c3e50;
+.chat-header{
+    background:#2563eb;
+    color:white;
+    padding:18px 25px;
+    font-size:22px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
 
-.subtitle{
-    text-align:center;
-    color:#666;
+.status{
+    font-size:13px;
+    color:#dbeafe;
+}
+
+.chat-area{
+    height:75vh;
+    overflow-y:auto;
+    padding:25px;
+    background:#eef2f7;
+    display:flex;
+    flex-direction:column;
 }
 
 form{
     display:flex;
     gap:10px;
+    margin-top:auto;
+    padding-top:20px;
 }
 
 input{
     flex:1;
-    padding:12px;
-    border-radius:8px;
+    padding:14px;
+    border-radius:25px;
     border:1px solid #ccc;
-}
-
-button{
-    cursor:pointer;
+    font-size:15px;
 }
 
 .ask-btn{
-    background:#3498db;
+    background:#2563eb;
     color:white;
     border:none;
-    padding:12px 20px;
-    border-radius:8px;
-}
-
-.faq-btn{
-    background:#f1f5f9;
-    border:none;
-    padding:10px;
-    margin:5px;
-    border-radius:8px;
-}
-
-.chat-box{
-    margin-top:20px;
+    border-radius:25px;
+    padding:14px 24px;
+    cursor:pointer;
 }
 
 .user-msg{
-    background:#dbeafe;
-    padding:12px;
-    border-radius:10px;
-    margin-bottom:10px;
+    background:#2563eb;
+    color:white;
+    width:fit-content;
+    max-width:70%;
+    padding:14px;
+    margin:15px 0 10px auto;
+    border-radius:18px 18px 4px 18px;
 }
 
 .bot-msg{
-    background:#ecfdf5;
-    padding:12px;
-    border-radius:10px;
-}
-
-.related-box{
-    margin-top:20px;
-    padding:15px;
-    background:#fff8e7;
-    border-radius:10px;
-}
-
-.related-question{
     background:white;
-    padding:10px;
-    margin:8px 0;
-    border-radius:8px;
+    width:fit-content;
+    max-width:70%;
+    padding:14px;
+    margin:10px 0;
+    border-radius:18px 18px 18px 4px;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+    white-space:pre-wrap;
+    line-height:1.6;
 }
+
+.chat-box{
+    display:flex;
+    flex-direction:column;
+    margin:15px 0;
+}
+
+.faq-btn{
+    margin:5px;
+    padding:10px 14px;
+    border:none;
+    border-radius:20px;
+    background:#dbeafe;
+    cursor:pointer;
+}
+
 
 .footer{
-    margin-top:25px;
     text-align:center;
+    padding:20px;
+    color:#666;
 }
-
 </style>
 
 <script>
 function fillQuestion(question){
 document.getElementById("questionInput").value = question;
+}
+window.onload = function () {
+    document.getElementById("questionInput").focus();
 }
 </script>
 
@@ -168,29 +212,14 @@ document.getElementById("questionInput").value = question;
 
 <body>
 
-<div class="container">
+<div class="chat-container">
 
-<h1>📚 StudyBuddy AI</h1>
-
-<div class="subtitle">
-Your AI-Powered Study Assistant
+<div class="chat-header">
+    🤖 <strong>StudyBuddy AI</strong>
+    <span class="status">● Online • Powered by Groq</span>
 </div>
 
-
-<form method="POST">
-
-<input
-id="questionInput"
-type="text"
-name="question"
-placeholder="Ask a study-related question..."
-required>
-
-<button class="ask-btn" type="submit">
-Ask
-</button>
-
-</form>
+<div class="chat-area">
 
 
 <h3>📌 Popular Questions</h3>
@@ -204,6 +233,15 @@ Improve concentration
 Pomodoro Technique
 </button>
 
+<button class="faq-btn"
+onclick="fillQuestion('How do I prepare for exams effectively?')">
+Exam Preparation
+</button>
+
+<button class="faq-btn"
+onclick="fillQuestion('What is active recall?')">
+Active Recall
+</button>
 
 <button class="faq-btn" onclick="fillQuestion('How can I avoid procrastination?')">
 Avoid procrastination
@@ -222,7 +260,7 @@ Avoid procrastination
 
 <div class="bot-msg">
 <strong>StudyBuddy AI:</strong><br>
-{{chat.answer}}
+{{chat.answer|safe}}
 </div>
 
 
@@ -231,34 +269,27 @@ Avoid procrastination
 {% endfor %}
 
 
+<form method="POST">
 
-{% if related_questions %}
+<input
+id="questionInput"
+type="text"
+name="question"
+placeholder="Type your study question here..."
+required>
 
-<div class="related-box">
+<button class="ask-btn" type="submit">
+Ask
+</button>
 
-<h3>📚 You may also want to ask</h3>
-
-{% for q in related_questions %}
-
-<div class="related-question"
-onclick="fillQuestion('{{q}}')">
-
-{{q}}
-
-</div>
-
-{% endfor %}
-
-</div>
-
-{% endif %}
-
-
+</form>
 
 <div class="footer">
-Powered by NLP (TF-IDF + Cosine Similarity)
+Powered by Groq • Llama 3.3 70B
 </div>
 
+
+</div>
 
 </div>
 
@@ -273,7 +304,6 @@ def home():
 
     answer = None
     question = ""
-    related_questions = []
 
     if "history" not in session:
         session["history"] = []
@@ -281,7 +311,7 @@ def home():
     if request.method == "POST":
         question = request.form["question"]
 
-        answer, related_questions = get_answer(question)
+        answer = get_answer(question)
         session["history"].append({
             "question": question,
             "answer": answer
@@ -289,11 +319,10 @@ def home():
 
         session["history"] = session["history"][-5:]
     return render_template_string(
-        HTML,
-        answer=answer,
-        question=question,
-        related_questions=related_questions
-    )
+    HTML,
+    answer=answer,
+    question=question
+)
 
 
 def open_browser():
